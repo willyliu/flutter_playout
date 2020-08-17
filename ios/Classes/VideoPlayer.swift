@@ -247,9 +247,8 @@ class VideoPlayer: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPlatfor
             self.playerViewController?.player = self.player
             self.playerViewController?.view.frame = self.frame
             self.playerViewController?.showsPlaybackControls = self.showControls
-            if #available(iOS 11.0, *) {
-              self.playerViewController?.entersFullScreenWhenPlaybackBegins = true  // willy: enable full screen
-            }
+            self.playerViewController?.videoGravity = .resizeAspectFill  // willy: enable full screen
+
             /* setup lock screen controls */
             setupRemoteTransportControls()
             
