@@ -681,7 +681,7 @@ public class PlayerLayout extends PlayerView implements FlutterAVPlayer, EventCh
             try {
 
                 final String errorMessage = "ExoPlaybackException Type [" + error.type + "] " +
-                        error.getSourceException().getCause().getMessage();
+                        ( error.getSourceException().getCause() != null ? error.getSourceException().getCause().getMessage() : error );
 
                 JSONObject message = new JSONObject();
 
