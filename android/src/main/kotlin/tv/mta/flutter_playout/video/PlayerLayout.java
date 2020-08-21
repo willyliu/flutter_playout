@@ -32,6 +32,7 @@ import com.google.android.exoplayer2.source.ProgressiveMediaSource;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.ui.PlayerView;
+import com.google.android.exoplayer2.ui.AspectRatioFrameLayout;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
@@ -214,7 +215,9 @@ public class PlayerLayout extends PlayerView implements FlutterAVPlayer, EventCh
 
         mPlayerView.addAnalyticsListener(new PlayerAnalyticsEventsListener());
 
-        mPlayerView.setVideoScalingMode(C.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING);
+        this.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_ZOOM);
+
+//        mPlayerView.setVideoScalingMode(C.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING);
 
         if (this.position >= 0) {
 
