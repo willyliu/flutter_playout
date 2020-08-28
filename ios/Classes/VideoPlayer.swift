@@ -191,6 +191,16 @@ class VideoPlayer: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPlatfor
         })
     }
     
+    /* retry until stream ready */
+    func loadLiveAVAsset(videoURL: URL) -> AVAsset{
+        var live_asset = AVAsset(url: videoURL)
+        while(!live_asset.duration.isIndefinite) {
+            sleep(2)
+            live_asset = AVAsset(url: videoURL)
+        }
+        return live_asset
+    }
+    
     func setupPlayer(){
         if let videoURL = URL(string: self.url.trimmingCharacters(in: .whitespacesAndNewlines)) {
             
@@ -201,7 +211,8 @@ class VideoPlayer: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPlatfor
             } catch _ { }
             
             /* Create the asset to play */
-            let asset = AVAsset(url: videoURL)
+            
+            let asset = loadLiveAVAsset(videoURL: videoURL)
             
             if (asset.isPlayable) {
                 /* Create a new AVPlayerItem with the asset and
@@ -278,7 +289,7 @@ class VideoPlayer: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPlatfor
             if let videoURL = URL(string: self.url) {
                 
                 /* create the new asset to play */
-                let asset = AVAsset(url: videoURL)
+                let asset = loadLiveAVAsset(videoURL: videoURL)
                 
                 let playerItem = AVPlayerItem(asset: asset, automaticallyLoadedAssetKeys: requiredAssetKeys)
                 
