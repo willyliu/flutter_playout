@@ -87,6 +87,8 @@ class VideoPlayer: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPlatfor
     
     private var nowPlayingInfo = [String : Any]()
     
+    private var isDisposing = false
+
     deinit {
         print("[dealloc] tv.mta/NativeVideoPlayer")
     }
@@ -356,6 +358,9 @@ class VideoPlayer: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPlatfor
                 case AVPlayerTimeControlStatus.paused:
                     isPlaying = false
                     self.flutterEventSink?(["name":"onPause"])
+                    if (!isDisposing) {
+                        p.playImmediately(atRate: 1.0)	// willy: for some unknown reason, hls will pause on start playing, so force restart playback on pause
+                    }
                     break
                 
                 case AVPlayerTimeControlStatus.playing:
@@ -547,7 +552,8 @@ class VideoPlayer: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPlatfor
     }
     
     public func dispose() {
-        
+        self.isDisposing = true
+
         self.player?.pause()
         
         /* clear lock screen metadata */
