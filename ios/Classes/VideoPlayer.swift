@@ -273,11 +273,11 @@ class VideoPlayer: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPlatfor
 				if (self.autoPlay) {
 					self.play()
 				}
+				
+				/* add player view controller to root view controller */
+				let viewController = (UIApplication.shared.delegate?.window??.rootViewController)!
+				viewController.addChild(self.playerViewController!)
 			}
-			
-			/* add player view controller to root view controller */
-			let viewController = (UIApplication.shared.delegate?.window??.rootViewController)!
-			viewController.addChild(self.playerViewController!)
         }
     }
 
