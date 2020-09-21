@@ -253,16 +253,7 @@ class VideoPlayer: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPlatfor
 					time in self.onTimeInterval(time: time)
 				}
 				
-				/* setup player view controller */
-				self.playerViewController = AVPlayerViewController()
-				if #available(iOS 10.0, *) {
-					self.playerViewController?.updatesNowPlayingInfoCenter = false
-				}
-				
 				self.playerViewController?.player = self.player
-				self.playerViewController?.view.frame = self.frame
-				self.playerViewController?.showsPlaybackControls = self.showControls
-				self.playerViewController?.videoGravity = .resizeAspectFill  // willy: enable full screen
 				
 				/* setup lock screen controls */
 				self.setupRemoteTransportControls()
@@ -274,6 +265,16 @@ class VideoPlayer: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPlatfor
 					self.play()
 				}
 			}
+			
+			/* setup player view controller */
+			self.playerViewController = AVPlayerViewController()
+			if #available(iOS 10.0, *) {
+				self.playerViewController?.updatesNowPlayingInfoCenter = false
+			}
+			
+			self.playerViewController?.view.frame = self.frame
+			self.playerViewController?.showsPlaybackControls = self.showControls
+			self.playerViewController?.videoGravity = .resizeAspectFill  // willy: enable full screen
 			
 			/* add player view controller to root view controller */
 			let viewController = (UIApplication.shared.delegate?.window??.rootViewController)!
