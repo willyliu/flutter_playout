@@ -214,68 +214,68 @@ class VideoPlayer: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPlatfor
 
             /* Create the asset to play */
 
-            let asset = loadLiveAVAsset(videoURL: videoURL)
-
-            if (asset.isPlayable) {
-                /* Create a new AVPlayerItem with the asset and
-                 an array of asset keys to be automatically loaded */
-                let playerItem = AVPlayerItem(asset: asset, automaticallyLoadedAssetKeys: requiredAssetKeys)
-
-                /* setup player */
-                self.player = FluterAVPlayer(playerItem: playerItem)
-            }
-            else {
-                /* not a valid playback asset */
-                /* setup empty player */
-                self.player = FluterAVPlayer()
-            }
-
-            let center = NotificationCenter.default
-
-            center.addObserver(self, selector: #selector(onComplete(_:)), name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: self.player?.currentItem)
-            center.addObserver(self, selector:#selector(onAVPlayerNewErrorLogEntry(_:)), name: .AVPlayerItemNewErrorLogEntry, object: player?.currentItem)
-            center.addObserver(self, selector:#selector(onAVPlayerFailedToPlayToEndTime(_:)), name: .AVPlayerItemFailedToPlayToEndTime, object: player?.currentItem)
-
-            if #available(iOS 12.0, *) {
-                self.player?.preventsDisplaySleepDuringVideoPlayback = true
-            }
-
-            /* Add observer for AVPlayer status and AVPlayerItem status */
-            self.player?.addObserver(self, forKeyPath: #keyPath(AVPlayer.status), options: [.new, .initial], context: nil)
-            self.player?.addObserver(self, forKeyPath: #keyPath(AVPlayerItem.status), options:[.old, .new, .initial], context: nil)
-            self.player?.addObserver(self, forKeyPath: #keyPath(AVPlayer.timeControlStatus), options:[.old, .new, .initial], context: nil)
-
-            /* setup callback for onTime */
-            let interval = CMTime(seconds: 1.0, preferredTimescale: CMTimeScale(NSEC_PER_SEC))
-            timeObserverToken = player?.addPeriodicTimeObserver(forInterval: interval, queue: .main) {
-                time in self.onTimeInterval(time: time)
-            }
-
-            /* setup player view controller */
-            self.playerViewController = AVPlayerViewController()
-            if #available(iOS 10.0, *) {
-                self.playerViewController?.updatesNowPlayingInfoCenter = false
-            }
-
-            self.playerViewController?.player = self.player
-            self.playerViewController?.view.frame = self.frame
-            self.playerViewController?.showsPlaybackControls = self.showControls
-            self.playerViewController?.videoGravity = .resizeAspectFill  // willy: enable full screen
-
-            /* setup lock screen controls */
-            setupRemoteTransportControls()
-
-            setupNowPlayingInfoPanel()
-
-            /* start playback if svet to auto play */
-            if (self.autoPlay) {
-                play()
-            }
-
-            /* add player view controller to root view controller */
-            let viewController = (UIApplication.shared.delegate?.window??.rootViewController)!
-            viewController.addChild(self.playerViewController!)
-
+			loadLiveAVAsset(videoURL: videoURL) { (asset) in
+				if (asset.isPlayable) {
+					/* Create a new AVPlayerItem with the asset and
+					an array of asset keys to be automatically loaded */
+					let playerItem = AVPlayerItem(asset: asset, automaticallyLoadedAssetKeys: self.requiredAssetKeys)
+					
+					/* setup player */
+					self.player = FluterAVPlayer(playerItem: playerItem)
+				}
+				else {
+					/* not a valid playback asset */
+					/* setup empty player */
+					self.player = FluterAVPlayer()
+				}
+				
+				let center = NotificationCenter.default
+				
+				center.addObserver(self, selector: #selector(self.onComplete(_:)), name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: self.player?.currentItem)
+				center.addObserver(self, selector:#selector(self.onAVPlayerNewErrorLogEntry(_:)), name: .AVPlayerItemNewErrorLogEntry, object: self.player?.currentItem)
+				center.addObserver(self, selector:#selector(self.onAVPlayerFailedToPlayToEndTime(_:)), name: .AVPlayerItemFailedToPlayToEndTime, object: self.player?.currentItem)
+				
+				if #available(iOS 12.0, *) {
+					self.player?.preventsDisplaySleepDuringVideoPlayback = true
+				}
+				
+				/* Add observer for AVPlayer status and AVPlayerItem status */
+				self.player?.addObserver(self, forKeyPath: #keyPath(AVPlayer.status), options: [.new, .initial], context: nil)
+				self.player?.addObserver(self, forKeyPath: #keyPath(AVPlayerItem.status), options:[.old, .new, .initial], context: nil)
+				self.player?.addObserver(self, forKeyPath: #keyPath(AVPlayer.timeControlStatus), options:[.old, .new, .initial], context: nil)
+				
+				/* setup callback for onTime */
+				let interval = CMTime(seconds: 1.0, preferredTimescale: CMTimeScale(NSEC_PER_SEC))
+				self.timeObserverToken = self.player?.addPeriodicTimeObserver(forInterval: interval, queue: .main) {
+					time in self.onTimeInterval(time: time)
+				}
+				
+				self.playerViewController?.player = self.player
+				
+				/* setup lock screen controls */
+				self.setupRemoteTransportControls()
+				
+				self.setupNowPlayingInfoPanel()
+				
+				/* start playback if svet to auto play */
+				if (self.autoPlay) {
+					self.play()
+				}
+			}
+			
+			/* setup player view controller */
+			self.playerViewController = AVPlayerViewController()
+			if #available(iOS 10.0, *) {
+				self.playerViewController?.updatesNowPlayingInfoCenter = false
+			}
+			
+			self.playerViewController?.view.frame = self.frame
+			self.playerViewController?.showsPlaybackControls = self.showControls
+			self.playerViewController?.videoGravity = .resizeAspectFill  // willy: enable full screen
+			
+			/* add player view controller to root view controller */
+			let viewController = (UIApplication.shared.delegate?.window??.rootViewController)!
+			viewController.addChild(self.playerViewController!)
         }
     }
 
