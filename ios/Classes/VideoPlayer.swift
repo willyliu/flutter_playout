@@ -193,15 +193,17 @@ class VideoPlayer: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPlatfor
         })
     }
 
-    /* retry until stream ready */
-    func loadLiveAVAsset(videoURL: URL) -> AVAsset{
-        var live_asset = AVAsset(url: videoURL)
-        while(!live_asset.duration.isIndefinite) {
-            sleep(2)
-            live_asset = AVAsset(url: videoURL)
-        }
-        return live_asset
-    }
+	func loadLiveAVAsset(videoURL: URL, callback: @escaping (AVAsset) -> Void) {
+		let liveAsset = AVAsset(url: videoURL)
+		if (!liveAsset.duration.isIndefinite) {
+			DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+				self.loadLiveAVAsset(videoURL: videoURL, callback: callback)				// your code here
+			}
+		}
+		else {
+			callback(liveAsset)
+		}
+	}
 
     func setupPlayer(){
         if let videoURL = URL(string: self.url.trimmingCharacters(in: .whitespacesAndNewlines)) {
@@ -291,15 +293,16 @@ class VideoPlayer: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPlatfor
             if let videoURL = URL(string: self.url) {
 
                 /* create the new asset to play */
-                let asset = loadLiveAVAsset(videoURL: videoURL)
+				self.loadLiveAVAsset(videoURL: videoURL) { (asset) in
 
-                let playerItem = AVPlayerItem(asset: asset, automaticallyLoadedAssetKeys: requiredAssetKeys)
+					let playerItem = AVPlayerItem(asset: asset, automaticallyLoadedAssetKeys: self.requiredAssetKeys)
 
-                p.replaceCurrentItem(with: playerItem)
+					p.replaceCurrentItem(with: playerItem)
 
-                /* setup lock screen controls */
-                setupRemoteTransportControls()
-                setupNowPlayingInfoPanel()
+					/* setup lock screen controls */
+					self.setupRemoteTransportControls()
+					self.setupNowPlayingInfoPanel()
+				}
             }
         }
     }
