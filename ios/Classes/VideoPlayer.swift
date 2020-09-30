@@ -410,11 +410,11 @@ class VideoPlayer: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPlatfor
     }
 
     @objc func onAVPlayerFailedToPlayToEndTime(_ notification: Notification) {
-        guard let error = notification.userInfo!["AVPlayerItemFailedToPlayToEndTimeErrorKey"] else {
+        guard let error = notification.userInfo!["AVPlayerItemFailedToPlayToEndTimeErrorKey"] as? Error else {
             return
         }
         isPlaying = false
-        self.flutterEventSink?(["name":"onError", "error":error])
+        self.flutterEventSink?(["name":"onError", "error":error.localizedDescription])
     }
 
     private func setupRemoteTransportControls() {
