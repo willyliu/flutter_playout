@@ -138,9 +138,9 @@ class VideoPlayer: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPlatfor
     /* set Flutter global method channel */
     private func setupGlobalMethodChannel(messenger:FlutterBinaryMessenger) {
 
-        let nativeMethodsChannel = FlutterMethodChannel(name: "tv.mta/NativeVideoPlayerMethodChannel", binaryMessenger: messenger);
+        let globalMethodsChannel = FlutterMethodChannel(name: "tv.mta/NativeVideoPlayerMethodChannel", binaryMessenger: messenger);
 
-        nativeMethodsChannel.setMethodCallHandler({
+        globalMethodsChannel.setMethodCallHandler({
             (call: FlutterMethodCall, result: @escaping FlutterResult) -> Void in
 
             /* disposeAll */
