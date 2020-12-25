@@ -108,6 +108,8 @@ class VideoPlayer: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPlatfor
 
         setupEventChannel(viewId: viewId, messenger: messenger, instance: self)
 
+        setupGlobalMethodChannel(messenger: messenger)
+
         setupMethodChannel(viewId: viewId, messenger: messenger)
 
         /* data as JSON */
@@ -131,6 +133,27 @@ class VideoPlayer: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPlatfor
         instance.eventChannel = FlutterEventChannel(name: "tv.mta/NativeVideoPlayerEventChannel_" + String(viewId), binaryMessenger: messenger, codec: FlutterJSONMethodCodec.sharedInstance())
 
         instance.eventChannel!.setStreamHandler(instance)
+    }
+
+    /* set Flutter global method channel */
+    private func setupGlobalMethodChannel(messenger:FlutterBinaryMessenger) {
+
+        let nativeMethodsChannel = FlutterMethodChannel(name: "tv.mta/NativeVideoPlayerMethodChannel", binaryMessenger: messenger);
+
+        nativeMethodsChannel.setMethodCallHandler({
+            (call: FlutterMethodCall, result: @escaping FlutterResult) -> Void in
+
+            /* disposeAll */
+            if ("disposeAll" == call.method) {
+
+                self.dispose()
+
+                result(true)
+            }
+
+            /* not implemented yet */
+            else { result(FlutterMethodNotImplemented) }
+        })
     }
 
     /* set Flutter method channel */

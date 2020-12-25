@@ -52,6 +52,7 @@ class Video extends StatefulWidget {
 
 class _VideoState extends State<Video> {
   MethodChannel _methodChannel;
+  MethodChannel _globalMethodChannel;
   int _platformViewId;
   Widget _playerWidget = Container();
 
@@ -59,6 +60,8 @@ class _VideoState extends State<Video> {
   void initState() {
     super.initState();
     _setupPlayer();
+    _globalMethodChannel =
+        MethodChannel("tv.mta/NativeVideoPlayerMethodChannel");
   }
 
   @override
@@ -159,6 +162,7 @@ class _VideoState extends State<Video> {
   @override
   void dispose() {
     _disposePlatformView(isDisposing: true);
+    _globalMethodChannel = null;
     super.dispose();
   }
 
@@ -244,6 +248,9 @@ class _VideoState extends State<Video> {
           _methodChannel = null;
         });
       }
+    } else if (_globalMethodChannel != null && _platformViewId == null) {
+      // Fixes #385, fallback to global method channel to dispose all
+      _globalMethodChannel.invokeMethod("disposeAll");
     }
   }
 }

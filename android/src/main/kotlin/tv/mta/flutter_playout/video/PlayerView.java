@@ -20,6 +20,24 @@ public class PlayerView implements PlatformView, MethodChannel.MethodCallHandler
         new MethodChannel(messenger, "tv.mta/NativeVideoPlayerMethodChannel_" + id)
                 .setMethodCallHandler(this);
 
+        // global method channel
+        new MethodChannel(messenger, "tv.mta/NativeVideoPlayerMethodChannel")
+                .setMethodCallHandler(
+                  new MethodChannel.MethodCallHandler() {
+                    @Override
+                    public void onMethodCall(MethodCall call, @NotNull MethodChannel.Result result) {
+                      switch (call.method) {
+                        case "disposeAll":
+                            PlayerView.this.dispose();
+                            result.success(true);
+                            break;
+                        default:
+                            result.notImplemented();
+                      }
+                    }
+                  }
+                );
+
         player = new PlayerLayout(context, activity, messenger, id, args);
     }
 
