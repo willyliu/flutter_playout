@@ -240,7 +240,7 @@ class _VideoState extends State<Video> {
   }
 
   void _disposePlatformView({bool isDisposing = false}) async {
-    if (_methodChannel != null && _platformViewId != null) {
+    if (_methodChannel != null) {
       _methodChannel.invokeMethod("dispose");
 
       if (!isDisposing) {
