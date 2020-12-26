@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
@@ -52,16 +53,16 @@ class Video extends StatefulWidget {
 
 class _VideoState extends State<Video> {
   MethodChannel _methodChannel;
-  MethodChannel _globalMethodChannel;
   int _platformViewId;
   Widget _playerWidget = Container();
+  final String _channelKey = Random().nextInt(65536).toString();
 
   @override
   void initState() {
     super.initState();
     _setupPlayer();
-    _globalMethodChannel =
-        MethodChannel("tv.mta/NativeVideoPlayerMethodChannel");
+    _methodChannel =
+        MethodChannel("tv.mta/NativeVideoPlayerMethodChannel_$_channelKey");
   }
 
   @override
@@ -87,12 +88,13 @@ class _VideoState extends State<Video> {
             "preferredAudioLanguage": widget.preferredAudioLanguage ?? "mul",
             "isLiveStream": widget.isLiveStream,
             "position": widget.position,
+            "channelKey": _channelKey,
           },
           creationParamsCodec: const JSONMessageCodec(),
           onPlatformViewCreated: (viewId) {
             _onPlatformViewCreated(viewId);
             if (widget.onViewCreated != null) {
-              widget.onViewCreated(viewId);
+              widget.onViewCreated(viewId, _channelKey);
             }
           },
           gestureRecognizers: <Factory<OneSequenceGestureRecognizer>>[
@@ -115,12 +117,13 @@ class _VideoState extends State<Video> {
             "subtitle": widget.subtitle ?? "",
             "preferredAudioLanguage": widget.preferredAudioLanguage ?? "mul",
             "isLiveStream": widget.isLiveStream,
+            "channelKey": _channelKey,
           },
           creationParamsCodec: const JSONMessageCodec(),
           onPlatformViewCreated: (viewId) {
             _onPlatformViewCreated(viewId);
             if (widget.onViewCreated != null) {
-              widget.onViewCreated(viewId);
+              widget.onViewCreated(viewId, _channelKey);
             }
           },
           gestureRecognizers: <Factory<OneSequenceGestureRecognizer>>[
@@ -162,14 +165,11 @@ class _VideoState extends State<Video> {
   @override
   void dispose() {
     _disposePlatformView(isDisposing: true);
-    _globalMethodChannel = null;
     super.dispose();
   }
 
   void _onPlatformViewCreated(int viewId) {
     _platformViewId = viewId;
-    _methodChannel =
-        MethodChannel("tv.mta/NativeVideoPlayerMethodChannel_$viewId");
   }
 
   /// The [desiredState] flag has changed so need to update playback to
@@ -248,9 +248,6 @@ class _VideoState extends State<Video> {
           _methodChannel = null;
         });
       }
-    } else if (_globalMethodChannel != null && _platformViewId == null) {
-      // Fixes #385, fallback to global method channel to dispose all
-      _globalMethodChannel.invokeMethod("disposeAll");
     }
   }
 }

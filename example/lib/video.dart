@@ -84,8 +84,8 @@ class _VideoPlayoutState extends State<VideoPlayout>
     );
   }
 
-  void _onViewCreated(int viewId) {
-    listenForVideoPlayerEvents(viewId);
+  void _onViewCreated(int viewId, String channelKey) {
+    listenForVideoPlayerEvents(channelKey);
     enableMultiAudioSupport(viewId);
   }
 

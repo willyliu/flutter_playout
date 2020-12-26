@@ -5,9 +5,9 @@ import 'package:flutter/services.dart';
 /// Use with Video or Audio widget to get player notifications such as
 /// [onPlay], [onPause] etc. See example on how to use.
 mixin PlayerObserver {
-  Future<void> listenForVideoPlayerEvents(int viewId) async {
+  Future<void> listenForVideoPlayerEvents(String channelKey) async {
     EventChannel eventChannel = EventChannel(
-        "tv.mta/NativeVideoPlayerEventChannel_$viewId", JSONMethodCodec());
+        "tv.mta/NativeVideoPlayerEventChannel_$channelKey", JSONMethodCodec());
     eventChannel.receiveBroadcastStream().listen(_processEvent);
   }
 
