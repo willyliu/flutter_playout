@@ -64,7 +64,7 @@ public class PlayerLayout extends PlayerView implements FlutterAVPlayer, EventCh
      * The notification id.
      */
     private static final int NOTIFICATION_ID = 0;
-    // public static SimpleExoPlayer activePlayer;
+    public static SimpleExoPlayer activePlayer;
     private final String TAG = "PlayerLayout";
     /**
      * Reference to the {@link SimpleExoPlayer}
@@ -187,12 +187,12 @@ public class PlayerLayout extends PlayerView implements FlutterAVPlayer, EventCh
         instance = this;
 
         /* release previous instance */
-        // if (activePlayer != null) {
+        if (activePlayer != null) {
 
-        //     activePlayer.release();
-        // }
+            activePlayer.release();
+        }
 
-        // activePlayer = mPlayerView;
+        activePlayer = mPlayerView;
     }
 
     @Override
@@ -459,7 +459,7 @@ public class PlayerLayout extends PlayerView implements FlutterAVPlayer, EventCh
 
                         message.put("time", mPlayerView.getCurrentPosition() / 1000);
 
-                        // Log.d(TAG, "onTime: [time=" + mPlayerView.getCurrentPosition() / 1000 + "]");
+                        Log.d(TAG, "onTime: [time=" + mPlayerView.getCurrentPosition() / 1000 + "]");
                         eventSink.success(message);
                     }
 
@@ -594,7 +594,7 @@ public class PlayerLayout extends PlayerView implements FlutterAVPlayer, EventCh
 
                 message.put("duration", mediaDuration);
 
-                // Log.d(TAG, "onDuration: [duration=" + mediaDuration + "]");
+                Log.d(TAG, "onDuration: [duration=" + mediaDuration + "]");
                 eventSink.success(message);
             }
 
@@ -618,7 +618,7 @@ public class PlayerLayout extends PlayerView implements FlutterAVPlayer, EventCh
 
             cleanPlayerNotification();
 
-            // activePlayer = null;
+            activePlayer = null;
 
         } catch (Exception e) { /* ignore */ }
     }
