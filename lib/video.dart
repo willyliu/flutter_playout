@@ -35,9 +35,11 @@ class Video extends StatefulWidget {
   final double position;
   final Function onViewCreated;
   final PlayerState desiredState;
+  final String channelKey;
 
   const Video(
       {Key key,
+      @required this.channelKey,
       this.autoPlay = false,
       this.showControls = true,
       this.url,
@@ -51,14 +53,15 @@ class Video extends StatefulWidget {
       : super(key: key);
 
   @override
-  _VideoState createState() => _VideoState();
+  _VideoState createState() => _VideoState(this.channelKey);
 }
 
 class _VideoState extends State<Video> {
   MethodChannel _methodChannel;
-  int _platformViewId;
   Widget _playerWidget = Container();
-  final String _channelKey = Random().nextInt(65536).toString();
+  String _channelKey;
+
+  _VideoState(this._channelKey);
 
   @override
   void initState() {
@@ -95,7 +98,6 @@ class _VideoState extends State<Video> {
           },
           creationParamsCodec: const JSONMessageCodec(),
           onPlatformViewCreated: (viewId) {
-            _onPlatformViewCreated(viewId);
             if (widget.onViewCreated != null) {
               widget.onViewCreated(viewId, _channelKey);
             }
@@ -124,7 +126,6 @@ class _VideoState extends State<Video> {
           },
           creationParamsCodec: const JSONMessageCodec(),
           onPlatformViewCreated: (viewId) {
-            _onPlatformViewCreated(viewId);
             if (widget.onViewCreated != null) {
               widget.onViewCreated(viewId, _channelKey);
             }
@@ -141,9 +142,6 @@ class _VideoState extends State<Video> {
 
   @override
   void didUpdateWidget(Video oldWidget) {
-    if (widget.url == null || widget.url.isEmpty) {
-      // _disposePlatformView();
-    }
     if (oldWidget.url != widget.url ||
         oldWidget.title != widget.title ||
         oldWidget.subtitle != widget.subtitle ||
@@ -163,16 +161,6 @@ class _VideoState extends State<Video> {
       _onSeekPositionChanged();
     }
     super.didUpdateWidget(oldWidget);
-  }
-
-  @override
-  void dispose() {
-    // _disposePlatformView(isDisposing: true);
-    super.dispose();
-  }
-
-  void _onPlatformViewCreated(int viewId) {
-    _platformViewId = viewId;
   }
 
   /// The [desiredState] flag has changed so need to update playback to
@@ -241,17 +229,4 @@ class _VideoState extends State<Video> {
       }
     }
   }
-
-  // changes to let package client do the disposing
-  // void _disposePlatformView({bool isDisposing = false}) async {
-  //   if (_methodChannel != null) {
-  //     _methodChannel.invokeMethod("dispose");
-
-  //     if (!isDisposing) {
-  //       setState(() {
-  //         _methodChannel = null;
-  //       });
-  //     }
-  //   }
-  // }
 }
