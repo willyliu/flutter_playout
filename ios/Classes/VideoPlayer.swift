@@ -197,11 +197,13 @@ class VideoPlayer: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPlatfor
         })
     }
 
-	func loadLiveAVAsset(videoURL: URL, callback: @escaping (AVAsset) -> Void) {
+	func loadLiveAVAsset(videoURL: URL, errorCount: Int, callback: @escaping (AVAsset) -> Void) {
 		let liveAsset = AVAsset(url: videoURL)
 		if (!liveAsset.duration.isIndefinite) {
-			DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-				self.loadLiveAVAsset(videoURL: videoURL, callback: callback)
+			DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+        if (errorCount < 60 && !self.isDisposing) {
+          self.loadLiveAVAsset(videoURL: videoURL, errorCount: (errorCount + 1), callback: callback)
+        }
 			}
 		}
 		else {
@@ -225,7 +227,7 @@ class VideoPlayer: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPlatfor
 
             /* Create the asset to play */
 
-			loadLiveAVAsset(videoURL: videoURL) { (asset) in
+			loadLiveAVAsset(videoURL: videoURL, errorCount: 0) { (asset) in
 				if (asset.isPlayable) {
 					/* Create a new AVPlayerItem with the asset and
 					an array of asset keys to be automatically loaded */
@@ -302,7 +304,7 @@ class VideoPlayer: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPlatfor
             if let videoURL = URL(string: self.url) {
 
                 /* create the new asset to play */
-				self.loadLiveAVAsset(videoURL: videoURL) { (asset) in
+				self.loadLiveAVAsset(videoURL: videoURL, errorCount: 0) { (asset) in
 
 					let playerItem = AVPlayerItem(asset: asset, automaticallyLoadedAssetKeys: self.requiredAssetKeys)
 
