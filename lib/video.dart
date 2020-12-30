@@ -21,6 +21,9 @@ import 'package:flutter_playout/player_state.dart';
 /// to get notified once the underlying [PlatformView] is setup. The
 /// [desiredState] enum can be used to control play/pause. If the value change,
 /// the widget will make sure that player is in sync with the new state.
+///
+/// IMPORTANT: For handling nasty lifecycle problem, we won't dispose platform
+/// here, let the package user to it.
 class Video extends StatefulWidget {
   final bool autoPlay;
   final bool showControls;
@@ -139,7 +142,7 @@ class _VideoState extends State<Video> {
   @override
   void didUpdateWidget(Video oldWidget) {
     if (widget.url == null || widget.url.isEmpty) {
-      _disposePlatformView();
+      // _disposePlatformView();
     }
     if (oldWidget.url != widget.url ||
         oldWidget.title != widget.title ||
@@ -164,7 +167,7 @@ class _VideoState extends State<Video> {
 
   @override
   void dispose() {
-    _disposePlatformView(isDisposing: true);
+    // _disposePlatformView(isDisposing: true);
     super.dispose();
   }
 
@@ -239,15 +242,16 @@ class _VideoState extends State<Video> {
     }
   }
 
-  void _disposePlatformView({bool isDisposing = false}) async {
-    if (_methodChannel != null) {
-      _methodChannel.invokeMethod("dispose");
+  // changes to let package client do the disposing
+  // void _disposePlatformView({bool isDisposing = false}) async {
+  //   if (_methodChannel != null) {
+  //     _methodChannel.invokeMethod("dispose");
 
-      if (!isDisposing) {
-        setState(() {
-          _methodChannel = null;
-        });
-      }
-    }
-  }
+  //     if (!isDisposing) {
+  //       setState(() {
+  //         _methodChannel = null;
+  //       });
+  //     }
+  //   }
+  // }
 }
