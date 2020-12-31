@@ -97,6 +97,8 @@ class VideoPlayer: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPlatfor
 
     init(frame:CGRect, viewId: Int64, messenger: FlutterBinaryMessenger, args: Any?) {
 
+		print("[init] tv.mta/NativeVideoPlayer with \(viewId)")
+
         /* set view properties */
         self.frame = frame
         self.viewId = viewId
@@ -198,20 +200,25 @@ class VideoPlayer: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPlatfor
     }
 
 	func loadLiveAVAsset(videoURL: URL, errorCount: Int, callback: @escaping (AVAsset) -> Void) {
+		if (isDisposing) {
+			return;
+		}
 		let liveAsset = AVAsset(url: videoURL)
 		if (!liveAsset.duration.isIndefinite) {
-			DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-        if (errorCount < 60 && !self.isDisposing) {
-          self.loadLiveAVAsset(videoURL: videoURL, errorCount: (errorCount + 1), callback: callback)
-        }
+			if (errorCount < 60 && !isDisposing) {
+				DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+					self.loadLiveAVAsset(videoURL: videoURL, errorCount: (errorCount + 1), callback: callback)
+				}
 			}
 		}
 		else {
 			// because we will initialize playerViewController after calling loadLiveAVAsset method,
 			// we have to invoke callback later through dispatch queue
 			// or else the playerViewController will be null and then we will get black screen
-			DispatchQueue.main.asyncAfter(deadline: .now()) {
-				callback(liveAsset)
+			if (!isDisposing) {
+				DispatchQueue.main.asyncAfter(deadline: .now()) {
+					callback(liveAsset)
+				}
 			}
 		}
 	}
@@ -228,6 +235,9 @@ class VideoPlayer: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPlatfor
             /* Create the asset to play */
 
 			loadLiveAVAsset(videoURL: videoURL, errorCount: 0) { (asset) in
+				if (self.isDisposing) {
+					return;
+				}
 				if (asset.isPlayable) {
 					/* Create a new AVPlayerItem with the asset and
 					an array of asset keys to be automatically loaded */
@@ -305,7 +315,9 @@ class VideoPlayer: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPlatfor
 
                 /* create the new asset to play */
 				self.loadLiveAVAsset(videoURL: videoURL, errorCount: 0) { (asset) in
-
+					if (self.isDisposing) {
+						return;
+					}
 					let playerItem = AVPlayerItem(asset: asset, automaticallyLoadedAssetKeys: self.requiredAssetKeys)
 
 					p.replaceCurrentItem(with: playerItem)
@@ -568,10 +580,10 @@ class VideoPlayer: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPlatfor
     public func dispose() {
         self.isDisposing = true
 
-        self.player?.pause()
-
         /* clear lock screen metadata */
         MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
+
+		self.player?.pause()
 
         /* remove observers */
         if let timeObserver = timeObserverToken {
