@@ -112,6 +112,8 @@ class VideoPlayer: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPlatfor
 
         setupMethodChannel(viewId: viewId, messenger: messenger)
 
+        setupGlobalMethodChannel(messenger: messenger)
+
         /* data as JSON */
         let parsedData = args as! [String: Any]
 
@@ -196,7 +198,7 @@ class VideoPlayer: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPlatfor
     }
 
         /* set Flutter global method channel */
-    private func setupGlobalMethodChannel(viewId: Int64, messenger:FlutterBinaryMessenger) {
+    private func setupGlobalMethodChannel(messenger:FlutterBinaryMessenger) {
 
         let nativeMethodsChannel = FlutterMethodChannel(name: "tv.mta/NativeVideoPlayerMethodChannel", binaryMessenger: messenger);
 
