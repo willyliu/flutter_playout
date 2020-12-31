@@ -21,9 +21,6 @@ import 'package:flutter_playout/player_state.dart';
 /// to get notified once the underlying [PlatformView] is setup. The
 /// [desiredState] enum can be used to control play/pause. If the value change,
 /// the widget will make sure that player is in sync with the new state.
-///
-/// IMPORTANT: For handling nasty lifecycle problem, we won't dispose platform
-/// here, let the package user to it.
 class Video extends StatefulWidget {
   final bool autoPlay;
   final bool showControls;
@@ -60,6 +57,7 @@ class _VideoState extends State<Video> {
   MethodChannel _methodChannel;
   Widget _playerWidget = Container();
   String _channelKey;
+  int _platformViewId;
 
   _VideoState(this._channelKey);
 
@@ -142,6 +140,9 @@ class _VideoState extends State<Video> {
 
   @override
   void didUpdateWidget(Video oldWidget) {
+    if (widget.url == null || widget.url.isEmpty) {
+      _disposePlatformView();
+    }
     if (oldWidget.url != widget.url ||
         oldWidget.title != widget.title ||
         oldWidget.subtitle != widget.subtitle ||
@@ -161,6 +162,16 @@ class _VideoState extends State<Video> {
       _onSeekPositionChanged();
     }
     super.didUpdateWidget(oldWidget);
+  }
+
+  @override
+  void dispose() {
+    _disposePlatformView(isDisposing: true);
+    super.dispose();
+  }
+
+  void _onPlatformViewCreated(int viewId) {
+    _platformViewId = viewId;
   }
 
   /// The [desiredState] flag has changed so need to update playback to
@@ -225,6 +236,18 @@ class _VideoState extends State<Video> {
           "subtitle": widget.subtitle,
           "isLiveStream": widget.isLiveStream,
           "showControls": widget.showControls,
+        });
+      }
+    }
+  }
+
+  void _disposePlatformView({bool isDisposing = false}) async {
+    if (_methodChannel != null) {
+      _methodChannel.invokeMethod("dispose");
+
+      if (!isDisposing) {
+        setState(() {
+          _methodChannel = null;
         });
       }
     }
