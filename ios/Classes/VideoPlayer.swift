@@ -72,8 +72,6 @@ class VideoPlayer: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPlatfor
     var isLiveStream:Bool = false
     var showControls:Bool = false
 
-    var channelKey:String = ""
-
     private var mediaDuration = 0.0
 
     private var isPlaying = false
@@ -110,6 +108,10 @@ class VideoPlayer: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPlatfor
             try audioSession.setCategory(AVAudioSession.Category.playback)
         } catch _ { }
 
+        setupEventChannel(viewId: viewId, messenger: messenger, instance: self)
+
+        setupMethodChannel(viewId: viewId, messenger: messenger)
+
         /* data as JSON */
         let parsedData = args as! [String: Any]
 
@@ -121,12 +123,6 @@ class VideoPlayer: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPlatfor
         self.isLiveStream = parsedData["isLiveStream"] as! Bool
         self.showControls = parsedData["showControls"] as! Bool
 
-        self.channelKey = parsedData["channelKey"] as! String
-
-        setupEventChannel(viewId: viewId, messenger: messenger, instance: self)
-
-        setupMethodChannel(viewId: viewId, messenger: messenger)
-
         setupPlayer()
     }
 
@@ -134,7 +130,7 @@ class VideoPlayer: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPlatfor
     private func setupEventChannel(viewId: Int64, messenger:FlutterBinaryMessenger, instance:VideoPlayer) {
 
         /* register for Flutter event channel */
-        instance.eventChannel = FlutterEventChannel(name: "tv.mta/NativeVideoPlayerEventChannel_" + self.channelKey, binaryMessenger: messenger, codec: FlutterJSONMethodCodec.sharedInstance())
+        instance.eventChannel = FlutterEventChannel(name: "tv.mta/NativeVideoPlayerEventChannel_" + String(viewId), binaryMessenger: messenger, codec: FlutterJSONMethodCodec.sharedInstance())
 
         instance.eventChannel!.setStreamHandler(instance)
     }
@@ -142,7 +138,7 @@ class VideoPlayer: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPlatfor
     /* set Flutter method channel */
     private func setupMethodChannel(viewId: Int64, messenger:FlutterBinaryMessenger) {
 
-        let nativeMethodsChannel = FlutterMethodChannel(name: "tv.mta/NativeVideoPlayerMethodChannel_" + self.channelKey, binaryMessenger: messenger);
+        let nativeMethodsChannel = FlutterMethodChannel(name: "tv.mta/NativeVideoPlayerMethodChannel_" + String(viewId), binaryMessenger: messenger);
 
         nativeMethodsChannel.setMethodCallHandler({
             (call: FlutterMethodCall, result: @escaping FlutterResult) -> Void in

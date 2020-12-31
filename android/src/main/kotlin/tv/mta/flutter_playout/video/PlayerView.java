@@ -4,8 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.view.View;
 
-import org.json.JSONObject;
-
 import org.jetbrains.annotations.NotNull;
 
 import io.flutter.plugin.common.BinaryMessenger;
@@ -17,19 +15,9 @@ public class PlayerView implements PlatformView, MethodChannel.MethodCallHandler
 
     private final PlayerLayout player;
 
-    private String channelKey = "";
-
     PlayerView(Context context, Activity activity, int id, BinaryMessenger messenger, Object args) {
 
-      try {
-
-        JSONObject argsObj = (JSONObject) args;
-
-        this.channelKey = argsObj.getString("channelKey");
-
-    } catch (Exception e) { /* ignore */ }
-
-        new MethodChannel(messenger, "tv.mta/NativeVideoPlayerMethodChannel_" + this.channelKey)
+        new MethodChannel(messenger, "tv.mta/NativeVideoPlayerMethodChannel_" + id)
                 .setMethodCallHandler(this);
 
         player = new PlayerLayout(context, activity, messenger, id, args);

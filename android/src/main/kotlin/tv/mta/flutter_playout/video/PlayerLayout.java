@@ -95,8 +95,6 @@ public class PlayerLayout extends PlayerView implements FlutterAVPlayer, EventCh
 
     private BinaryMessenger messenger;
 
-    private String channelKey = "";
-
     private String url = "";
 
     private String title = "";
@@ -163,8 +161,6 @@ public class PlayerLayout extends PlayerView implements FlutterAVPlayer, EventCh
         try {
 
             JSONObject args = (JSONObject) arguments;
-
-            this.channelKey = args.getString("channelKey");
 
             this.url = args.getString("url");
 
@@ -236,7 +232,7 @@ public class PlayerLayout extends PlayerView implements FlutterAVPlayer, EventCh
 
         new EventChannel(
                 messenger,
-                "tv.mta/NativeVideoPlayerEventChannel_" + this.channelKey,
+                "tv.mta/NativeVideoPlayerEventChannel_" + this.viewId,
                 JSONMethodCodec.INSTANCE).setStreamHandler(this);
 
         updateMediaSource();

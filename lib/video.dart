@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
@@ -32,11 +31,9 @@ class Video extends StatefulWidget {
   final double position;
   final Function onViewCreated;
   final PlayerState desiredState;
-  final String channelKey;
 
   const Video(
       {Key key,
-      @required this.channelKey,
       this.autoPlay = false,
       this.showControls = true,
       this.url,
@@ -50,23 +47,20 @@ class Video extends StatefulWidget {
       : super(key: key);
 
   @override
-  _VideoState createState() => _VideoState(this.channelKey);
+  _VideoState createState() => _VideoState();
 }
 
 class _VideoState extends State<Video> {
   MethodChannel _methodChannel;
   Widget _playerWidget = Container();
-  String _channelKey;
   int _platformViewId;
 
-  _VideoState(this._channelKey);
+  _VideoState();
 
   @override
   void initState() {
     super.initState();
     _setupPlayer();
-    _methodChannel =
-        MethodChannel("tv.mta/NativeVideoPlayerMethodChannel_$_channelKey");
   }
 
   @override
@@ -92,12 +86,12 @@ class _VideoState extends State<Video> {
             "preferredAudioLanguage": widget.preferredAudioLanguage ?? "mul",
             "isLiveStream": widget.isLiveStream,
             "position": widget.position,
-            "channelKey": _channelKey,
           },
           creationParamsCodec: const JSONMessageCodec(),
           onPlatformViewCreated: (viewId) {
+            _onPlatformViewCreated(viewId);
             if (widget.onViewCreated != null) {
-              widget.onViewCreated(viewId, _channelKey);
+              widget.onViewCreated(viewId);
             }
           },
           gestureRecognizers: <Factory<OneSequenceGestureRecognizer>>[
@@ -120,12 +114,12 @@ class _VideoState extends State<Video> {
             "subtitle": widget.subtitle ?? "",
             "preferredAudioLanguage": widget.preferredAudioLanguage ?? "mul",
             "isLiveStream": widget.isLiveStream,
-            "channelKey": _channelKey,
           },
           creationParamsCodec: const JSONMessageCodec(),
           onPlatformViewCreated: (viewId) {
+            _onPlatformViewCreated(viewId);
             if (widget.onViewCreated != null) {
-              widget.onViewCreated(viewId, _channelKey);
+              widget.onViewCreated(viewId);
             }
           },
           gestureRecognizers: <Factory<OneSequenceGestureRecognizer>>[
@@ -172,6 +166,8 @@ class _VideoState extends State<Video> {
 
   void _onPlatformViewCreated(int viewId) {
     _platformViewId = viewId;
+    _methodChannel =
+        MethodChannel("tv.mta/NativeVideoPlayerMethodChannel_$viewId");
   }
 
   /// The [desiredState] flag has changed so need to update playback to
