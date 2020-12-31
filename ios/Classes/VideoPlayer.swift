@@ -95,7 +95,7 @@ class VideoPlayer: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPlatfor
 
     init(frame:CGRect, viewId: Int64, messenger: FlutterBinaryMessenger, args: Any?) {
 
-		print("[init] tv.mta/NativeVideoPlayer with \(viewId)")
+        print("[init] tv.mta/NativeVideoPlayer with \(viewId)")
 
         /* set view properties */
         self.frame = frame
@@ -190,6 +190,22 @@ class VideoPlayer: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPlatfor
                 result(true)
             }
 
+            /* not implemented yet */
+            else { result(FlutterMethodNotImplemented) }
+        })
+    }
+
+        /* set Flutter global method channel */
+    private func setupGlobalMethodChannel(viewId: Int64, messenger:FlutterBinaryMessenger) {
+
+        let nativeMethodsChannel = FlutterMethodChannel(name: "tv.mta/NativeVideoPlayerMethodChannel", binaryMessenger: messenger);
+
+        nativeMethodsChannel.setMethodCallHandler({
+            (call: FlutterMethodCall, result: @escaping FlutterResult) -> Void in
+            if ("dispose" == call.method) {
+                self.dispose()
+                result(true)
+            }
             /* not implemented yet */
             else { result(FlutterMethodNotImplemented) }
         })
@@ -579,7 +595,7 @@ class VideoPlayer: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPlatfor
         /* clear lock screen metadata */
         MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
 
-		self.player?.pause()
+        self.player?.pause()
 
         /* remove observers */
         if let timeObserver = timeObserverToken {

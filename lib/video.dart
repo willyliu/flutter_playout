@@ -73,6 +73,7 @@ class _VideoState extends State<Video> {
 
   void _setupPlayer() {
     if (widget.url != null && widget.url.isNotEmpty) {
+      print('_setupPlayer called');
       /* Android */
       if (Platform.isAndroid) {
         _playerWidget = AndroidView(
@@ -165,6 +166,7 @@ class _VideoState extends State<Video> {
   }
 
   void _onPlatformViewCreated(int viewId) {
+    print('platform view created with viewId: $viewId');
     _platformViewId = viewId;
     _methodChannel =
         MethodChannel("tv.mta/NativeVideoPlayerMethodChannel_$viewId");
@@ -239,6 +241,7 @@ class _VideoState extends State<Video> {
 
   void _disposePlatformView({bool isDisposing = false}) async {
     if (_methodChannel != null) {
+      print('dispose platform view with viewId: $_platformViewId');
       _methodChannel.invokeMethod("dispose");
 
       if (!isDisposing) {
@@ -246,6 +249,11 @@ class _VideoState extends State<Video> {
           _methodChannel = null;
         });
       }
+    } else {
+      print('fallback to use global method channel to dispose platform view');
+      var _globalMethodChannel =
+          MethodChannel("tv.mta/NativeVideoPlayerMethodChannel");
+      _globalMethodChannel.invokeMethod("dispose");
     }
   }
 }
