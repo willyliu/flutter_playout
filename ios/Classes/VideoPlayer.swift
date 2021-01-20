@@ -309,7 +309,7 @@ class VideoPlayer: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPlatfor
 
 			self.playerViewController?.view.frame = self.frame
 			self.playerViewController?.showsPlaybackControls = self.showControls
-			self.playerViewController?.videoGravity = .resizeAspectFill  // willy: enable full screen
+			self.playerViewController?.videoGravity = .resizeAspect  // willy: enable full screen and keeps aspect ratio
 
 			/* add player view controller to root view controller */
 			let viewController = (UIApplication.shared.delegate?.window??.rootViewController)!
