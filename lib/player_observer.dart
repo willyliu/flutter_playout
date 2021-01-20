@@ -44,6 +44,9 @@ mixin PlayerObserver {
   /// Override this method to get errors thrown by the player
   void onError(String error) {/* user implementation */}
 
+  /// Override this method to get video size
+  void onVideoSize(double width, double height) {/* user implementation */}
+
   void _processEvent(dynamic event) async {
     String eventName = event["name"];
 
@@ -88,6 +91,12 @@ mixin PlayerObserver {
 
       case "onError":
         onError(event["error"]);
+        break;
+
+      case 'onVideoSize':
+        double width = double.parse("${event["width"]}");
+        double height = double.parse("${event["height"]}");
+        onVideoSize(width, height);
         break;
 
       default:

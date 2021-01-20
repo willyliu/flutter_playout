@@ -37,6 +37,7 @@ import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 import com.google.android.exoplayer2.C;
+import com.google.android.exoplayer2.video.VideoListener;
 
 import org.json.JSONObject;
 
@@ -234,6 +235,23 @@ public class PlayerLayout extends PlayerView implements FlutterAVPlayer, EventCh
                 messenger,
                 "tv.mta/NativeVideoPlayerEventChannel_" + this.viewId,
                 JSONMethodCodec.INSTANCE).setStreamHandler(this);
+
+
+        mPlayerView.addVideoListener(new VideoListener() {
+            @Override
+            public void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees, float pixelWidthHeightRatio) {
+                try {
+                    JSONObject message = new JSONObject();
+                    message.put("name", "onVideoSize");
+                    message.put("width", width);
+                    message.put("height", height);
+                    Log.d(TAG, "onVideoSizeChanged: [width=" + width + ", height" + height + "]");
+                    eventSink.success(message);
+                } catch (Exception e) {
+                    Log.e(TAG, "onVideoSizeChanged: ", e);
+                }
+            }
+      });
 
         updateMediaSource();
 

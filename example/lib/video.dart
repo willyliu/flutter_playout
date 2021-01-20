@@ -11,18 +11,22 @@ import 'package:flutter_playout_example/hls/getManifestLanguages.dart';
 class VideoPlayout extends StatefulWidget {
   final PlayerState desiredState;
   final bool showPlayerControls;
+  final String url;
 
-  const VideoPlayout({Key key, this.desiredState, this.showPlayerControls})
+  const VideoPlayout(
+      {@required this.url, Key key, this.desiredState, this.showPlayerControls})
       : super(key: key);
 
   @override
-  _VideoPlayoutState createState() => _VideoPlayoutState();
+  _VideoPlayoutState createState() => _VideoPlayoutState(this.url);
 }
 
 class _VideoPlayoutState extends State<VideoPlayout>
     with PlayerObserver, MultiAudioSupport {
-  final String _url = null;
+  final String _url;
   List<HLSManifestLanguage> _hlsLanguages = List<HLSManifestLanguage>();
+
+  _VideoPlayoutState(this._url);
 
   @override
   void initState() {
@@ -129,5 +133,11 @@ class _VideoPlayoutState extends State<VideoPlayout>
   void onError(String error) {
     // TODO: implement onError
     super.onError(error);
+  }
+
+  @override
+  void onVideoSize(double width, double height) {
+    // TODO: implement onVideoSize
+    super.onVideoSize(width, height);
   }
 }

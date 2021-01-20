@@ -280,6 +280,7 @@ class VideoPlayer: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPlatfor
 				self.player?.addObserver(self, forKeyPath: #keyPath(AVPlayer.status), options: [.new, .initial], context: nil)
 				self.player?.addObserver(self, forKeyPath: #keyPath(AVPlayerItem.status), options:[.old, .new, .initial], context: nil)
 				self.player?.addObserver(self, forKeyPath: #keyPath(AVPlayer.timeControlStatus), options:[.old, .new, .initial], context: nil)
+				self.player?.addObserver(self, forKeyPath: "currentItem.presentationSize", options: [ .new], context: nil)
 
 				/* setup callback for onTime */
 				let interval = CMTime(seconds: 1.0, preferredTimescale: CMTimeScale(NSEC_PER_SEC))
@@ -413,7 +414,15 @@ class VideoPlayer: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPlatfor
                     break
                 }
             }
-
+        } else if keyPath == "currentItem.presentationSize" {
+			guard let p = object as! AVPlayer? else {
+				return
+			}
+			guard let presentationSize = p.currentItem?.presentationSize else {
+				return
+			}
+			print("presentationSize: \(presentationSize)")
+			self.flutterEventSink?(["name":"onVideoSize", "width":presentationSize.width, "height": presentationSize.height])
         } else {
             super.observeValue(forKeyPath: keyPath,
                                of: object,
