@@ -216,7 +216,7 @@ public class PlayerLayout extends PlayerView implements FlutterAVPlayer, EventCh
 
         mPlayerView.addAnalyticsListener(new PlayerAnalyticsEventsListener());
 
-        this.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FIT);
+        this.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_ZOOM);
 
 //        mPlayerView.setVideoScalingMode(C.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING);
 
