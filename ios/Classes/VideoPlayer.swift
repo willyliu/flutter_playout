@@ -396,7 +396,7 @@ class VideoPlayer: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPlatfor
 
                 switch (p.timeControlStatus) {
 
-                case AVPlayerTimeControlStatus.paused:
+                case AVPlayer.TimeControlStatus.paused:
                     isPlaying = false
                     self.flutterEventSink?(["name":"onPause"])
                     if (!isDisposing) {
@@ -404,7 +404,7 @@ class VideoPlayer: NSObject, FlutterPlugin, FlutterStreamHandler, FlutterPlatfor
                     }
                     break
 
-                case AVPlayerTimeControlStatus.playing:
+                case AVPlayer.TimeControlStatus.playing:
                     isPlaying = true
                     self.flutterEventSink?(["name":"onPlay"])
                     break

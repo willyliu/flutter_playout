@@ -228,11 +228,11 @@ class AudioPlayer: NSObject, FlutterPlugin, FlutterStreamHandler {
                 
                 switch (p.timeControlStatus) {
                 
-                case AVPlayerTimeControlStatus.paused:
+                case AVPlayer.TimeControlStatus.paused:
                     self.flutterEventSink?(["name":"onPause"])
                     break
                 
-                case AVPlayerTimeControlStatus.playing:
+                case AVPlayer.TimeControlStatus.playing:
                     self.flutterEventSink?(["name":"onPlay"])
                     break
                 
