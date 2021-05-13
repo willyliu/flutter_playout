@@ -14,8 +14,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/flutter_playout/ios"
 
 SPEC CHECKSUMS:
-  Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
-  flutter_playout: a5aed32b3003b02eb4432815ecfe0c0e42a801ff
+  Flutter: 434fef37c0980e73bb6479ef766c45957d4b510c
+  flutter_playout: 9bf68c5e56d071026b22f7dea6fbc75fd0346424
 
 PODFILE CHECKSUM: aafe91acc616949ddb318b77800a7f51bffa2a4c
 
